@@ -8,7 +8,7 @@ const NavBar = memo(function NavBar(props) {
       <div>
         <div className="sidenav">
           <div className="closebtn" onClick={clickedCloseBtn}>&times;</div>
-          <div className="active" onClick={props.searchClick}>Search</div>
+          <div className="active" onClick={props.searchClick}>Home</div>
           {
             (props.user !== null)
             ?
