@@ -63,7 +63,7 @@ body {
 ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
    text-indent: 11px;
    opacity: 1; /* Firefox */
-   color: #696969;
+   color: #3d5a91;
 }
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
    text-indent: 11px;
