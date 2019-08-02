@@ -64,6 +64,7 @@ body {
    text-indent: 11px;
    opacity: 1; /* Firefox */
    color: #73797f;
+   font-weight: 500;
 }
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
    text-indent: 11px;
