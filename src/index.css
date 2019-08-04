@@ -629,7 +629,7 @@ position: fixed;
 z-index: 1300;
 top: 0;
 left: 0;
-background-color: #a6aaae;   /*#3d4591*/
+background-color: #3d4591;   /*#3d4591*/
 overflow-x: hidden;
 padding-top: 60px;
 -webkit-transform: translateX(-220px);
@@ -691,10 +691,11 @@ cursor: pointer;
 
 .active {
   color: white;
-  padding: 18px 18px 18px 32px;
+  padding: 12px 18px 12px 32px;
   text-decoration: none;
   font-size: 20px;
   cursor: pointer;
+  font-weight: 700;
   font-family: 'Roboto', sans-serif;
 }
 .active:hover {
@@ -728,7 +729,7 @@ padding-top: 24px;
 position: fixed; /* Set the navbar to fixed position */
 top: 0; /* Position the navbar at the top of the page */
 width: 100%; /* Full width */
-z-index: 50;
+z-index: 1002;
 border-bottom: 1px solid #D3D3D3;
 }
 
