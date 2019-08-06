@@ -899,10 +899,10 @@ class MapContainer extends Component {
   }
 
   exploreHP = (evt) => {
-    if(evt.target.textContent === 'Melbourne, AU') this.fetchSightingsAfterPlace(-38.4338593, -37.5112737, 144.59374179999998, 145.51252880000004, "AU", "Melbourne VIC, Australia", -37.8136276, 144.96305759999996);
-    if(evt.target.textContent === 'Sausalito, US') this.fetchSightingsAfterPlace(37.843927, 37.872909, -122.51208409999998, -122.47508199999999, "US", "Sausalito, CA 94965, USA", 37.85909369999999, -122.4852507);
-    if(evt.target.textContent === 'Nairobi, KE') this.fetchSightingsAfterPlace(-1.4416739, -1.164744, 36.645419100000026, 37.049374599999965, "KE", "Nairobi, Kenya", -1.2920659, 36.82194619999996);
-    if(evt.target.textContent === 'Copenhagen, DK') this.fetchSightingsAfterPlace(55.615441, 55.7270937, 12.45338240000001, 12.734265400000027, "DK", "Copenhagen, Denmark", 55.6760968, 12.568337199999974);
+    if(evt.target.textContent === 'MELBOURNE, AU') this.fetchSightingsAfterPlace(-38.4338593, -37.5112737, 144.59374179999998, 145.51252880000004, "AU", "Melbourne VIC, Australia", -37.8136276, 144.96305759999996);
+    if(evt.target.textContent === 'SAUSALITO, US') this.fetchSightingsAfterPlace(37.843927, 37.872909, -122.51208409999998, -122.47508199999999, "US", "Sausalito, CA 94965, USA", 37.85909369999999, -122.4852507);
+    if(evt.target.textContent === 'NAIROBI, KE') this.fetchSightingsAfterPlace(-1.4416739, -1.164744, 36.645419100000026, 37.049374599999965, "KE", "Nairobi, Kenya", -1.2920659, 36.82194619999996);
+    if(evt.target.textContent === 'COPENHAGEN, DK') this.fetchSightingsAfterPlace(55.615441, 55.7270937, 12.45338240000001, 12.734265400000027, "DK", "Copenhagen, Denmark", 55.6760968, 12.568337199999974);
   }
 
   render() {
@@ -1090,7 +1090,7 @@ class MapContainer extends Component {
                   className="buttonloadmore"
                   onClick={this.loadMore}
                   backgroundColor="#424242"
-                  style={{ color: 'white', height: '45px', marginBottom: '15px' }}
+                  style={{ fontFamily: 'Roboto', fontSize: '13px', color: 'white', height: '45px', marginBottom: '15px' }}
                   secondary
                 >
                   See More
@@ -1120,7 +1120,7 @@ class MapContainer extends Component {
                   className="buttonloadmore"
                   onClick={this.loadMore}
                   backgroundColor="#e5e5e5"
-                  style={{ color: 'white', marginBottom: '15px', height: '45px' }}
+                  style={{ fontFamily: 'Roboto', fontSize: '13px', color: 'white', marginBottom: '15px', height: '45px' }}
                   disabled
                 >
                   Loading...
@@ -1149,7 +1149,7 @@ class MapContainer extends Component {
                   <RaisedButton
                     className="buttonloadmore"
                     backgroundColor="#666666"
-                    style={{ color: 'white', marginBottom: '15px', height: '45px' }}
+                    style={{ fontFamily: 'Roboto', fontSize: '13px', color: 'white', marginBottom: '15px', height: '45px' }}
                     disabled
                   >
                   No more results
@@ -1215,14 +1215,14 @@ class MapContainer extends Component {
       </div>
       {searchBar}
       <div id="cities-to-explore">
-        <p id="p-explore">- Places to explore -</p>
+        <p id="p-explore">Places to explore</p>
       </div>
 
         <div className="container-cities">
-          <button className="item" onClick={this.exploreHP}><p>Melbourne, AU</p></button>
-          <button className="item" onClick={this.exploreHP}><p>Sausalito, US</p></button>
-          <button className="item" onClick={this.exploreHP}><p>Nairobi, KE</p></button>
-          <button className="item" onClick={this.exploreHP}><p>Copenhagen, DK</p></button>
+          <button className="item" onClick={this.exploreHP}>MELBOURNE, AU</button>
+          <button className="item" onClick={this.exploreHP}>SAUSALITO, US</button>
+          <button className="item" onClick={this.exploreHP}>NAIROBI, KE</button>
+          <button className="item" onClick={this.exploreHP}>COPENHAGEN, DK</button>
         </div>
 
       <Map

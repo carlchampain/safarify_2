@@ -401,7 +401,7 @@ class SavedAnimals extends Component {
       <div>
         <NavBarMap 
           onLeftIconButtonClick={this.handleIconClick}
-          title={animalNameInTitle}
+          title={animalNameInTitle === 'null' ? clickedSpecie : animalNameInTitle} 
         />
         <Suspense fallback={<LoadingContainer isLoading={isMapVisible}/>}>
           <MapVisible

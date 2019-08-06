@@ -71,6 +71,7 @@ export default class SavedAnimalsCards extends Component {
                   ?
 
                   propsState.latNameFinal.map((elem, i) => {
+                    console.log(propsState.vernacularNameFinal[i], elem);
                     return (
                       <div key={i + 700} className="divcard">
                         <div className="h2savedcards">{(propsState.placeFinal[i] === propsState.placeFinal[i - 1]) ? '' : propsState.placeFinal[i]}</div> 
@@ -90,8 +91,8 @@ export default class SavedAnimalsCards extends Component {
                                 <CardTitle
         
                                   className="cardtitle"
-                                  title={(propsState.vernacularNameFinal[i] === 'Not found') ? elem : propsState.vernacularNameFinal[i]}
-                                  subtitle={(propsState.vernacularNameFinal[i] === 'Not found') ? '' : elem}
+                                  title={(propsState.vernacularNameFinal[i] === 'null') ? elem : propsState.vernacularNameFinal[i]}
+                                  subtitle={(propsState.vernacularNameFinal[i] === 'null') ? '' : elem}
                                   titleStyle={{ color: '#373737', lineHeight: '28px' }}
                                   subtitleStyle={{
                                     color: '#424242',

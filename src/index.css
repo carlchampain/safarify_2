@@ -41,7 +41,7 @@ body {
 
 .formId {
  position: relative;
- padding-top: 80px;
+ padding-top: 60px;
  top: 190px;
 }
 
@@ -64,7 +64,6 @@ body {
    text-indent: 11px;
    opacity: 1; /* Firefox */
    color: #73797f;
-   font-weight: 500;
 }
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
    text-indent: 11px;
@@ -75,14 +74,13 @@ body {
 
 #searchbar {
    border: 1px solid #e9e9e9;
-   font-size: 16px;
    font-family: 'Roboto', sans-serif;
-   font-weight: 400;
+   font-size: 16px;
    letter-spacing: 0.25;
    color: #151515;
    text-indent: 10px;
    width: 89%;
-   height: 35px;
+   height: 45px;
    outline-width: 0;
    -webkit-border-radius: 5px;
    -moz-border-radius: 5px;
@@ -112,7 +110,7 @@ body {
 
 #welcome {
  margin: auto;
- font-size: 24px;
+ font-size: 26px;
  font-family: 'Playfair Display', serif;
  font-weight: 900;
  line-height: 20px;
@@ -215,7 +213,7 @@ a {
 
 #clouds{
  
- top: -300px;
+ top: -210px;
  position: relative; 
 }
 
@@ -327,7 +325,7 @@ left: -4px;
 width: 100%;
 height: 100%;
 border-radius: 50%;
-background-color:#D8BFD8;
+background-color:#3d4591;
 opacity: 0.6;
 position: absolute;
 top: 0;
@@ -508,18 +506,17 @@ text-align: center;
 text-decoration: none;
 display: inline-block;
 font-size: 16px;
-width: 45%;
+width: 70%;
 -webkit-border-radius: 5px;
 -moz-border-radius: 5px;
 border-radius: 5px;
 font-family: 'Roboto';
-font-weight: medium;
-letter-spacing: 0.75;
+font-size: 13px;
 }
 
 #delwrapper {
 position: relative;
-top: 150px;
+top: 200px;
 text-align: center;
 }
 
@@ -538,15 +535,14 @@ font-size: 16px;
 
 /* saved cards */
 .h2savedcards { 
-font-size: 19px;
-font-weight: 800;
-letter-spacing: 0.75px;
-color: #3d4591;
-font-family: 'Roboto';
-margin-bottom: 15px;
-margin-top: 32px;
-text-align: center;
-color: #424242;
+  font-size: 17px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;  
+  color: #3d4591;
+  margin-bottom: 15px;
+  margin-top: 32px;
+  text-align: center;
+  color: #424242;
 }
 
 /* Loading h3 for info under map sightingd */
@@ -559,12 +555,12 @@ text-align: center;
 position: relative;
 margin-bottom: 400px;
 margin-top: 215px;
-color: #3d4591;
+color: #3d4591; 
 font-family: 'Roboto';
 font-weight: medium;
 letter-spacing: 0.75;
 font-size: 15px;
-opacity: 0.6;
+opacity: 0.9;
 }
 
 /* Capitalize first letter of Pop trend */
@@ -624,7 +620,7 @@ text-transform: uppercase;
 /* TEST FOR NAVBAR */
 .sidenav {
 height: 100%;
-width: 220px;
+width: 245px;
 position: fixed;
 z-index: 1300;
 top: 0;
@@ -632,8 +628,8 @@ left: 0;
 background-color: #3d4591;   /*#3d4591*/
 overflow-x: hidden;
 padding-top: 60px;
--webkit-transform: translateX(-220px);
-transform: translateX(-220px);
+-webkit-transform: translateX(-245px);
+transform: translateX(-245px);
 transition: transform 200ms linear;
 }
 
@@ -650,6 +646,7 @@ will-change: transform;
   top: 0;
   right: 15px;
   font-size: 36px;
+  font-weight: 700;
   margin-left: 50px;
   color: white;
   cursor: pointer;
@@ -693,7 +690,7 @@ cursor: pointer;
   color: white;
   padding: 12px 18px 12px 32px;
   text-decoration: none;
-  font-size: 20px;
+  font-size: 21px;
   cursor: pointer;
   font-weight: 700;
   font-family: 'Roboto', sans-serif;
@@ -709,9 +706,11 @@ cursor: pointer;
     display: block;
     margin-top: -50px;
     color: #3d4591;
-    /* font-family: 'Roboto', sans-serif; */
-    /* font-size: 20px; */
 } 
+.material-icons {
+  font-weight: 600;
+  font-size: 27px;
+}
 
 #safarify-logo {
   display: block;
@@ -725,7 +724,7 @@ overflow: hidden;
 /* text-align: center; */
 background-color: #eef3f9;
 padding-bottom: 17px;
-padding-top: 24px;
+padding-top: 32px;
 position: fixed; /* Set the navbar to fixed position */
 top: 0; /* Position the navbar at the top of the page */
 width: 100%; /* Full width */
@@ -777,8 +776,8 @@ border-bottom: 1px solid #D3D3D3;
   white-space: nowrap;
   width: 100%;
   position: absolute;
-  top: 320px;
-  color: #3d5a91;
+  top: 315px;
+  color: #3d4591;
   z-index: 1299;
 }
 
@@ -791,17 +790,33 @@ border-bottom: 1px solid #D3D3D3;
 }
 
 .p-saved-explore {
-  font-family: 'Roboto';
-  font-size: 24px;
+  font-family: 'Playfair Display', serif;
+  font-size: 23px;
   font-weight: 800;
   text-align: center;
   bottom: 20px;
   padding-top: 70px
 }
 
+#acc-settings {
+  white-space: nowrap;
+  width: 100%;
+  position: relative;
+  top: 65px;
+  border-bottom: 1px solid #D3D3D3;
+}
+
+#p-acc-settings{
+  font-family: 'Playfair Display', serif;
+    font-size: 23px;
+    font-weight: 800;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
 #p-explore {
-  font-family: 'Roboto';
-  font-size: 24px;
+  font-family: 'Playfair Display', serif;;
+  font-size: 23px;
   font-weight: 800;
   text-align: center;
   bottom: 20px;
@@ -851,15 +866,15 @@ margin: auto;
 .item {
 width: 100%;
 max-width: 89%;
-height: 50%;
-background: #dddef0;
+height: 45px;
+background: #3d4591; /* #dddef0;*/
 overflow: hidden;
 border-radius: 5px;
 text-align: center;
 font-family: 'Roboto';
-font-size: 17px;
-font-weight: 800;
-color: #73797f;
-margin-bottom: 25px;
+font-size: 13px;
+/* font-weight: 800; */
+color:white; /*#73797f;*/
+margin-bottom: 15px;
 border: none;
 }
