@@ -47,6 +47,7 @@ const NavBar = memo(function NavBar(props) {
             <div className="active" onClick={props.getMoreSpecific}>Reptiles</div>
             <div className="active" onClick={props.getMoreSpecific}>Amphibians</div>
             <div className="active" onClick={props.getMoreSpecific}>Insects</div>
+            <div className="active" onClick={props.getMoreSpecific}>Arachnids</div>
             <div className="active" onClick={props.getMoreSpecific}>All Results</div>
         </div>
         <div className="topnav" id="myTopnav">

@@ -271,6 +271,14 @@ class MapContainer extends Component {
                      &hasGeospatialIssue=false\
                      &classKey=216\
                      &limit=300`;              
+    const arachnids = `https://api.gbif.org/v1/occurrence/search?\
+                     decimalLatitude=${viewportLatMax},${viewportLatMin}\
+                     &decimalLongitude=${viewportLngMin},${viewportLngMax}\
+                     &hasCoordinate=true\
+                     &kingdomKey=1\
+                     &hasGeospatialIssue=false\
+                     &classKey=367\
+                     &limit=300`;              
     this.setState({
       species: [],
       commonName: [],
@@ -285,10 +293,10 @@ class MapContainer extends Component {
       isLoaded: false,
       counter: 5,
       errorHandling: false
-    }, this.optionsFilterMenu(evt, birds, mammals, reptiles, amphibians, insects));
+    }, this.optionsFilterMenu(evt, birds, mammals, reptiles, amphibians, insects, arachnids));
   }
 
-  optionsFilterMenu = (evt, birds, mammals, reptiles, amphibians, insects) => {
+  optionsFilterMenu = (evt, birds, mammals, reptiles, amphibians, insects, arachnids) => {
     if (evt.target.textContent === 'Birds') {
       this.setState({ noResultsError: false, hasErrorBoundaries: false, errorHandlingGbif: false, errorHandling: false, isAmphRept: false });
       setTimeout(() => this.getSpeciesInRadius(birds), 100);
@@ -312,6 +320,10 @@ class MapContainer extends Component {
     if (evt.target.textContent === 'Insects') {
       this.setState({ noResultsError: false, hasErrorBoundaries: false, errorHandlingGbif: false, errorHandling: false, isAmphRept: true });
       setTimeout(() => this.getSpeciesInRadius(insects), 100);
+    }
+    if (evt.target.textContent === 'Arachnids') {
+      this.setState({ noResultsError: false, hasErrorBoundaries: false, errorHandlingGbif: false, errorHandling: false, isAmphRept: true });
+      setTimeout(() => this.getSpeciesInRadius(arachnids), 100);
     }
   }
 
@@ -679,10 +691,11 @@ class MapContainer extends Component {
         try { 
           const lat = place.geometry.location.lat();
           const lng = place.geometry.location.lng();
-          const viewportLngMin = place.geometry.viewport.ia.j; 
-          const viewportLngMax = place.geometry.viewport.ia.l;
+          const viewportLngMin = place.geometry.viewport.ga.j; 
+          const viewportLngMax = place.geometry.viewport.ga.l;
           const viewportLatMin = place.geometry.viewport.na.l;
           const viewportLatMax = place.geometry.viewport.na.j;
+          console.log(viewportLngMin, viewportLngMax, viewportLatMin, viewportLatMax);
           this.fetchSightingsAfterPlace(viewportLatMax, viewportLatMin, viewportLngMin, viewportLngMax, countryCode, formattedAdress, lat, lng);
         } catch (e) {
           console.log(e);
@@ -699,7 +712,7 @@ class MapContainer extends Component {
     &hasCoordinate=true\
     &kingdomKey=1\
     &hasGeospatialIssue=false\
-    &classKey=359&classKey=358&classKey=212&classKey=131&classKey=216\
+    &classKey=359&classKey=358&classKey=212&classKey=131&classKey=216&classKey=367\
     &limit=300`;
       this.setState({
       countryCode,
