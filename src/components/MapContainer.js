@@ -355,7 +355,7 @@ class MapContainer extends Component {
           speciesArray.push(gbif[i].species);
           speciesKeyArray.push(gbif[i].speciesKey);
           taxonKeyArray.push(gbif[i].taxonKey);
-          fallbackPhotosArray.push((!gbif[i].media ? null : gbif[i].media[0].identifier));
+          fallbackPhotosArray.push((gbif[i].media.length === 0 ? null : gbif[i].media[0].identifier));
         }
       }
         this.setState({
@@ -691,11 +691,10 @@ class MapContainer extends Component {
         try { 
           const lat = place.geometry.location.lat();
           const lng = place.geometry.location.lng();
-          const viewportLngMin = place.geometry.viewport.ga.j; 
-          const viewportLngMax = place.geometry.viewport.ga.l;
-          const viewportLatMin = place.geometry.viewport.na.l;
-          const viewportLatMax = place.geometry.viewport.na.j;
-          console.log(viewportLngMin, viewportLngMax, viewportLatMin, viewportLatMax);
+          const viewportLngMin = place.geometry.viewport.Ta.g; 
+          const viewportLngMax = place.geometry.viewport.Ta.i;
+          const viewportLatMin = place.geometry.viewport.Ya.i;
+          const viewportLatMax = place.geometry.viewport.Ya.g;
           this.fetchSightingsAfterPlace(viewportLatMax, viewportLatMin, viewportLngMin, viewportLngMax, countryCode, formattedAdress, lat, lng);
         } catch (e) {
           console.log(e);
@@ -829,6 +828,25 @@ class MapContainer extends Component {
     this.homeClickApp();
   }
 
+  //TODO: check first if the animal is not in the db. If it is in the db, do not add it
+  //start ==>
+  // dataSnapshotDB = () => {
+  //   if (fire.auth.currentUser !== null) {
+  //     this.setState({ isLoading: true });
+  //     const uid = fire.auth.currentUser.uid;
+  //     const uniqueKeyArr = [];
+
+  //     fire.db.ref('users/' + uid + '/saved_cards/')
+  //       .once("value", function(snapshot) {
+  //     }, function (errorObject) {
+  //       console.log("The read failed: " + errorObject.code);
+  //     })
+
+  //     .then((dataSnapshot) => {
+  //       if (dataSnapshot.val() !== null) { 
+  // loop through the result and compare with animal the user is trying to add
+  //PROS: no need to execute a write operation and then a delete operation (this is how it currently works)
+  // ===> Better perf  
   likeClick = (event) => {
     const user = fire.auth.currentUser;
     if (user) {
