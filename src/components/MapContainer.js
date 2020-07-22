@@ -691,10 +691,10 @@ class MapContainer extends Component {
         try { 
           const lat = place.geometry.location.lat();
           const lng = place.geometry.location.lng();
-          const viewportLngMin = place.geometry.viewport.Ta.g; 
-          const viewportLngMax = place.geometry.viewport.Ta.i;
-          const viewportLatMin = place.geometry.viewport.Ya.i;
-          const viewportLatMax = place.geometry.viewport.Ya.g;
+          const viewportLngMin = place.geometry.viewport.Ua.i; 
+          const viewportLngMax = place.geometry.viewport.Ua.j;
+          const viewportLatMin = place.geometry.viewport.Ya.j;
+          const viewportLatMax = place.geometry.viewport.Ya.i;
           this.fetchSightingsAfterPlace(viewportLatMax, viewportLatMin, viewportLngMin, viewportLngMax, countryCode, formattedAdress, lat, lng);
         } catch (e) {
           console.log(e);
