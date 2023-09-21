@@ -1,0 +1,51 @@
+{
+  "name": "safarify_2",
+  "version": "0.1.0",
+  "engines": {
+    "node": "11.1.0"
+  },
+  "private": true,
+  "dependencies": {
+    "@mars/heroku-js-runtime-env": "^3.0.2",
+    "@material-ui/core": "^1.2.0",
+    "aws-sdk": "^2.1455.0",
+    "axios": "^0.27.2",
+    "dotenv": "^6.1.0",
+    "firebase": "^5.8.6",
+    "firebase-admin": "^6.5.1",
+    "google-maps-react": "^1.1.11",
+    "lodash": "^4.17.21",
+    "material-design-icons": "^3.0.1",
+    "material-ui": "^0.20.0",
+    "material-ui-search-bar": "^0.4.1",
+    "react": "18.1.0",
+    "react-addons-create-fragment": "^15.6.1",
+    "react-addons-css-transition-group": "^15.6.2",
+    "react-dom": "18.1.0",
+    "react-places-autocomplete": "^6.1.3",
+    "react-scripts": "3.0.1",
+    "react-transition-group": "^1.2.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "heroku-postbuild": "echo Skip build on Heroku"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

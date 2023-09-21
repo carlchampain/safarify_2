@@ -1,0 +1,20 @@
+{
+  "short_name": "Safarify",
+  "name": "Safarify",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#eef3f9",
+  "background_color": "#eef3f9",
+  "icons": [
+    {
+      "src": "/bear_256.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/bear_256.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]  
+}

@@ -1,0 +1,12 @@
+{   
+  "https_only": true,
+  "root": "build/",
+  "routes": {
+    "/**": "index.html"
+  },
+  "headers": {
+    "/**": {
+      "Access-Control-Allow-Origin": "*"
+    }
+  }  
+}
