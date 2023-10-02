@@ -1,6 +1,7 @@
 import React, { memo, useEffect } from 'react';
 import { GoogleApiWrapper, Map, Marker, InfoWindow } from 'google-maps-react';
 import { googleMapKey, flickerKey } from '../firebase/api_keys';
+import getLicenseName from '../modules/Licenses';
 import svgArrow from '../down-arrow-svgrepo-com.svg';
 import axios from 'axios';
 
@@ -9,7 +10,7 @@ import axios from 'axios';
 // Can remove onReady in <Map>
 
 function flickrMorePhotosSpecies(specie, fallback) {
-    const flickrURL = `https://api.flickr.com/services/rest/?method=flickr.photos.search&text=${specie}&api_key=${flickerKey}&per_page=10&format=json&sort=relevance&nojsoncallback=?&license=1,2,3,4,5,6,7,8,9,10`;
+    const flickrURL = `https://api.flickr.com/services/rest/?method=flickr.photos.search&text=${specie}&api_key=${flickerKey}&per_page=10&format=json&sort=relevance&nojsoncallback=?&license=1,2,4,5,7,8,9,10`;
     axios.get(flickrURL)
         .then((resFlickr) => {
         const photoLength = resFlickr.data.photos.photo.length;
@@ -42,8 +43,9 @@ function flickrMorePhotosSpecies(specie, fallback) {
 async function fetchMoreOwnerPhoto(i, id) {
        await axios.get(`https://www.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=${flickerKey}&photo_id=${id}&format=json&nojsoncallback=1`)
       .then(response => {
+            let license = getLicenseName(response.data.photo.license)
             let photoCreditEl = document.getElementsByClassName('photo-tag')[i].nextSibling;
-            photoCreditEl.innerText = `© ${response.data.photo.owner.realname !== '' ? response.data.photo.owner.realname : response.data.photo.owner.username}`
+            photoCreditEl.innerText = `© ${response.data.photo.owner.realname !== '' ? (response.data.photo.owner.realname + '\n' + license) : (response.data.photo.owner.username + '\n' + license)}`
       })
       .catch(errorFlickr => {
             console.log(errorFlickr)
@@ -93,6 +95,7 @@ const MapVisible = memo(function MapVisible(props) {
                 <InfoWindow
                     visible={props.showingInfoWindow}
                     position={props.activeMarker}
+                    onClose={props.notVisible}
                     style={{ overflowY: 'auto' }}
                 >
                 <div>

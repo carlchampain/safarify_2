@@ -169,11 +169,18 @@ class SavedAnimals extends Component {
     snapFromDbArrFinal.sort((a, b) => {
       const firstVar = a.place.replace(/[0-9]/g, '').replace(/^\s+/g, '');
       const secVar = b.place.replace(/[0-9]/g, '').replace(/^\s+/g, '');
-      if (firstVar === secVar){
-        return a.vernacular_name < b.vernacular_name ? -1 : 1
-      } 
-      else {
-        return firstVar < secVar ? -1 : 1
+      if (firstVar === secVar) {
+        const aName = a.vernacular_name || a.sci_name || '';
+        const bName = b.vernacular_name || b.sci_name || '';
+    
+        // If both are sci_name, compare them directly
+        if (!a.vernacular_name && !b.vernacular_name) {
+          return aName.localeCompare(bName, undefined, { sensitivity: 'base' });
+        }
+    
+        return aName.localeCompare(bName, undefined, { sensitivity: 'base' });
+      } else {
+        return firstVar.localeCompare(secVar, undefined, { sensitivity: 'base' });
       }
      });
      this.finalStateUpdate(snapFromDbArrFinal, uniqueKeyArr);

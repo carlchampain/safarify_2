@@ -313,12 +313,14 @@ margin-left: -1px;
 }
 
 .spinner {
-top: 190px;
-width: 100px;
-height: 100px;
-margin: auto;
-position: relative;
-left: -4px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100px;
+  height: 100px;
+  margin: auto;
 }
 
 .double-bounce1, .double-bounce2 {
@@ -486,20 +488,18 @@ color: #3d4591;
 font-family: 'Roboto';
 font-size: 20px;
 font-weight: 500;
-margin-top: 9px;
-margin-bottom: 9px;
 text-align: center;
 line-height: 27px;
-position: relative;
-top: 200px;
 color: #FF6161;
 padding: 15px;
 border-style: solid;
-width: 65%;
-margin: auto;
--webkit-border-radius: 15px;
--moz-border-radius: 15px;
+width: 65%; /* You can adjust this as needed */
 border-radius: 15px;
+position: fixed; /* Using fixed or absolute positioning */
+top: 50%; /* Centering vertically */
+left: 50%; /* Centering horizontally */
+transform: translate(-50%, -50%); /* Adjusts for the height and width of the element */
+margin: 0; /* Removing margin, it's not needed with this centering method */
 }
 
 #filter {
@@ -577,15 +577,14 @@ position: relative;
 
 .loadingslow {
 text-align: center;
-position: relative;
-margin-bottom: 400px;
-margin-top: 215px;
+margin-top: 130px;
 color: #3d4591; 
 font-family: 'Roboto';
 font-weight: medium;
 letter-spacing: 0.75;
 font-size: 15px;
 opacity: 0.9;
+flex-direction: column;
 }
 
 /* Capitalize first letter of Pop trend */

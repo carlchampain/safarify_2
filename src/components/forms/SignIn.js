@@ -72,7 +72,6 @@ class SignInForm extends Component {
       return (
         <div>
           <LoadingContainer />
-          <div className="loadingslow">Logging in...</div>
         </div>
       );
     }

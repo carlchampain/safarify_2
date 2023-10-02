@@ -84,8 +84,8 @@ export default class Cards extends Component {
                           />
                         <CardTitle
                           className="cardtitle"
-                          title={(this.props.stateFromMap.commonName[i] === null) ? this.props.stateFromMap.species[i].toLowerCase() : this.props.stateFromMap.commonName[i]}
-                          subtitle={(this.props.stateFromMap.commonName[i] === null) ? '' : this.props.stateFromMap.species[i].toLowerCase()} 
+                          title={(this.props.stateFromMap.commonName[i] === null ? this.props.stateFromMap.species[i] : this.props.stateFromMap.commonName[i].split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '))}
+                          subtitle={(this.props.stateFromMap.commonName[i] === null ? '' : this.props.stateFromMap.species[i])} 
                           titleStyle={{ color: '#474747' }}
                           subtitleStyle={{
                             color: '#474747',
@@ -95,7 +95,7 @@ export default class Cards extends Component {
                             letterSpacing: '0.25'}}
                         >
                         <CardText className="cardtextstyle">
-                        Photo credit © {this.props.stateFromMap.photoOwners[i]}
+                        Photo credit © {this.props.stateFromMap.photoOwners[i]} {this.props.stateFromMap.licenseOwners[i]}
                       </CardText>
                       </CardTitle>
                        

@@ -1,5 +1,6 @@
 import React, { Component, lazy, Suspense } from 'react';
 import removeDuplicates from '../modules/RemoveDuplicates';
+import getLicenseName from '../modules/Licenses';
 import RaisedButton from 'material-ui/FlatButton';
 import axios from 'axios';
 import { GoogleApiWrapper, Map } from 'google-maps-react';
@@ -92,7 +93,10 @@ const INITIAL_STATE = {
   activeGbifOccurence: '',
   listOfAnimals: [],
   photoId: [],
-  photoOwners: []
+  photoOwners: [],
+  fallbackPhotoOwner: [],
+  fallbackPhotoOwnerArray: [],
+  licenseOwners: []
 };
 
 
@@ -345,6 +349,7 @@ class MapContainer extends Component {
       fallbackPhotosArray: [],
       photoUrl: [],
       photoOwners: [],
+      licenseOwners: [],
       photoId: [],
       isLoading: true,
       isLoaded: false,
@@ -410,6 +415,7 @@ class MapContainer extends Component {
       const speciesArray = [];
       const speciesKeyArray = [];
       const fallbackPhotosArray = [];
+      const fallbackPhotoOwnerArray = [];
       const GbifResults = gbif.length;
       if (GbifResults === 0) {
         this.setState({
@@ -423,6 +429,7 @@ class MapContainer extends Component {
           speciesKeyArray.push(gbif[i].speciesKey);
           taxonKeyArray.push(gbif[i].taxonKey);
           fallbackPhotosArray.push((gbif[i].media.length === 0 ? null : gbif[i].media[0].identifier));
+          fallbackPhotoOwnerArray.push((gbif[i].media.length === 0 ? "Unknown" : (gbif[i].media[0].rightsHolder === undefined ? gbif[i].media[0].publisher : gbif[i].media[0].rightsHolder)));
         }
       }
         this.setState({
@@ -432,15 +439,19 @@ class MapContainer extends Component {
           taxonKey: taxonKeyArray.slice(0, counter),
           fallbackPhotos: fallbackPhotosArray.slice(0, counter),
           fallbackPhotosArray,
+          fallbackPhotoOwner: fallbackPhotoOwnerArray.slice(0, counter),
+          fallbackPhotoOwnerArray,
           speciesArray,
           speciesKeyArray,
           taxonKeyArray,
           commonName: [],
           loadingUpdate: true
-        }, this.redListCall);
+        });
       if (GbifResults > 0) {
-        this.flickerCall();
-        this.vernacularName();
+        //Red List Call ??
+        this.vernacularName()
+          .then(() => this.flickerCall())
+            .then(() => this.redListCall())
       }
     }).catch(errorGbif => {
         if (errorGbif.response) {
@@ -461,77 +472,94 @@ class MapContainer extends Component {
       });
   }
 
-  //Function to GET the common names of animals using the species' taxon key
-  vernacularName = async function() {
+  //Function to GET the common names of animals using the species' taxon key 
+
+  vernacularName = async function () {
     const { species, taxonKey, commonName, counter, isAmphRept } = this.state;
     const commonNameArray = [];
     this.signal = axios.CancelToken.source();
+    const requests = [];
+  
     for (let i = counter - 10; i < species.length; i++) {
-      await axios.get(`https://api.gbif.org/v1/species/${taxonKey[i]}/vernacularNames`, {
+      const request = axios.get(`https://api.gbif.org/v1/species/${taxonKey[i]}/vernacularNames`, {
         cancelToken: this.signal.token,
-      }).then((res) => {
-        const vernName = res.data.results;   
-        if (vernName.length === 0) {
-          commonNameArray.push(null);
-        }
-        if (isAmphRept) {
-          for (let i = 0; i < vernName.length; i++) {
-            if (((vernName[i].source === 'Catalogue of Life' ||
-                vernName[i].source === 'Taxonomy in Flux Checklist' ||
-                vernName[i].source === 'Integrated Taxonomic Information System (ITIS)' ||
-                vernName[i].source === 'Multilingual IOC World Bird List, v8.1' ||
-                vernName[i].source === 'The Clements Checklist' ||
-                vernName[i].source === 'Colaboraciones Americanas Sobre Aves' ||
-                vernName[i].source === 'The Paleobiology Database' ||
-                vernName[i].source === 'Belgian Species List')
-                && vernName[i].language === 'eng') ||
-                vernName[i].source === 'NCBI Taxonomy' ||
-                vernName[i].source === 'Global Invasive Species Database') {
-                  const responseName = vernName[i].vernacularName;
-                  commonNameArray.push(responseName);
-                  break;
-            }
+      });
+  
+      requests.push(request);
+    }
+  
+    try {
+      const responses = await axios.all(requests);
+  
+      responses.forEach((response, i) => {
+        const vernName = response.data.results;
+        let foundName = null;
+  
+        for (let j = 0; j < vernName.length; j++) {
+          const source = vernName[j].source;
+          const language = vernName[j].language;
+  
+          if (
+            ((isAmphRept &&
+              (source === 'Catalogue of Life' ||
+                source === 'Taxonomy in Flux Checklist' ||
+                source === 'Integrated Taxonomic Information System (ITIS)' ||
+                source === 'Multilingual IOC World Bird List, v8.1' ||
+                source === 'The Clements Checklist' ||
+                source === 'Colaboraciones Americanas Sobre Aves' ||
+                source === 'The Paleobiology Database' ||
+                source === 'Belgian Species List') &&
+              language === 'eng') ||
+              source === 'NCBI Taxonomy' ||
+              source === 'Global Invasive Species Database') ||
+            (!isAmphRept &&
+              ((source === 'Catalogue of Life' ||
+                source === 'Taxonomy in Flux Checklist' ||
+                source === 'Integrated Taxonomic Information System (ITIS)' ||
+                source === 'Multilingual IOC World Bird List, v8.1' ||
+                source === 'The Clements Checklist' ||
+                source === 'Colaboraciones Americanas Sobre Aves' ||
+                source === 'The Paleobiology Database' ||
+                source === 'NCBI Taxonomy' ||
+                source === 'EUNIS Biodiversity Database') &&
+                language === 'eng'))
+          ) {
+            foundName = vernName[j].vernacularName;
+            break;
           }
         }
-        if (!isAmphRept) {
-          for (let i = 0; i < vernName.length; i++) {
-            if (((vernName[i].source === 'Catalogue of Life' ||
-                vernName[i].source === 'Taxonomy in Flux Checklist' ||
-                vernName[i].source === 'Integrated Taxonomic Information System (ITIS)' ||
-                vernName[i].source === 'Multilingual IOC World Bird List, v8.1' ||
-                vernName[i].source === 'The Clements Checklist' ||
-                vernName[i].source === 'Colaboraciones Americanas Sobre Aves' ||
-                vernName[i].source === 'The Paleobiology Database' ||
-                vernName[i].source === 'NCBI Taxonomy' ||
-                vernName[i].source === "EUNIS Biodiversity Database")
-                && vernName[i].language === 'eng') 
-                ) {
-                  const responseName = vernName[i].vernacularName;
-                  commonNameArray.push(responseName);
-                  break;
-            } 
-          }  
-        } 
-        if ((commonNameArray.length + commonName.length) !== i + 1) {
-            commonNameArray.push(null);
-        }
-        console.log()
-      }).catch((error) => {
-          if (axios.isCancel(error)) {
-            console.log('Request canceled', error.message);
-          } 
+  
+        if (!foundName) {
           commonNameArray.push(null);
-          this.setState({
-            commonName: commonName.concat(commonNameArray)
-          }, this.loopForFallback); 
-        });
-        if (i === species.length - 1) {
-            this.setState({
-              commonName: commonName.concat(commonNameArray)
-            }, this.loopForFallback); 
+        } else {
+          commonNameArray.push(foundName);
         }
+  
+        // Check if all requests have been processed
+        if (commonNameArray.length === species.length - (counter - 10)) {
+          this.setState(
+            {
+              commonName: commonName.concat(commonNameArray)
+            },
+            this.loopForFallback
+          );
+        }
+      });
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log('Request canceled', error.message);
+      } else {
+        commonNameArray.push(null);
+        this.setState(
+          {
+            commonName: commonName.concat(commonNameArray)
+          },
+          this.loopForFallback
+        );
+      }
     }
-  }  
+  };
+  
 
   loopForFallback = () => {
     for(let j=this.state.counter-10; j<this.state.commonName.length; j++) {
@@ -563,16 +591,28 @@ class MapContainer extends Component {
 
   }
 
-  //This function makes a call to the RedList API in order to GET the conservation status of species
+
   redListCall = async function() {
     const { species, counter, category, speciesArrLength, speciesLength } = this.state;
     const categoryArray = [];
     this.signal = axios.CancelToken.source();
+    const requestPromises = [];
     for (let i = counter - 10; i < species.length; i++) {
-      await axios.get(`https://apiv3.iucnredlist.org/api/v3/species/${species[i]}?token=${redListKey}`, {
-        cancelToken: this.signal.token,
-      })
-        .then(res => {
+      requestPromises.push(
+        axios.get(`https://apiv3.iucnredlist.org/api/v3/species/${species[i]}?token=${redListKey}`, {
+          cancelToken: this.signal.token,
+        })
+      );
+    }
+  
+    try {
+      const responses = await axios.all(requestPromises);
+      console.log("res ==> ", responses, counter)
+      responses.forEach((res, i) => {
+        console.log("category ==> ", res, i)
+        if (res.data.result.length === 0) {
+          categoryArray.push('Unknown');
+        } else {
           const responseCategory = res.data.result[0].category;
           switch (responseCategory) {
             case 'VU':
@@ -594,48 +634,50 @@ class MapContainer extends Component {
               categoryArray.push('Near Threatened');
               break;
             default:
-              categoryArray.push(responseCategory);
+              categoryArray.push('Unknown');
           }
-          if (i === counter - 1) { 
-              this.setState({
-                category: category.concat(categoryArray)
-              });
-          }
-          if (speciesArrLength === speciesLength) { 
-              this.setState({
-                category: category.concat(categoryArray)
-              });
-          }
-        })
-        .catch((error) => {
-          if (axios.isCancel(error)) {
-            console.log('Request canceled', error.message);
-          }
-          const err = '';
-          categoryArray.push(err);
+        }
+  
+        if (i === counter - 1 || speciesArrLength === speciesLength) {
           this.setState({
-            category: category.concat(categoryArray)
-          });    
-        });
+            category: category.concat(categoryArray),
+            counter: counter + 10
+          });
+        }
+      });
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log('Request canceled', error.message);
+      }
+      const err = '';
+      categoryArray.push(err);
+      this.setState({
+        category: category.concat(categoryArray),
+        counter: counter + 10
+      });
     }
   }
+  
 
   loadMore = () => {
     //TODO: Maybe use concat method instead od slice? see flickerCall !!!
-    const { counter, speciesArray, speciesKeyArray, taxonKeyArray, fallbackPhotosArray } = this.state;
+    const { counter, speciesArray, speciesKeyArray, taxonKeyArray, fallbackPhotosArray, fallbackPhotoOwnerArray } = this.state;
     this.setState({
       bottomLoading: true,
       species: speciesArray.slice(0, counter),
       speciesKey: speciesKeyArray.slice(0, counter),
       taxonKey: taxonKeyArray.slice(0, counter),
-      fallbackPhotos: fallbackPhotosArray.slice(0, counter)
+      fallbackPhotos: fallbackPhotosArray.slice(0, counter),
+      fallbackPhotoOwner: fallbackPhotoOwnerArray.slice(0, counter)
     }, this.loadMoreStatusAndName);
   }
 
   loadMoreStatusAndName = () => {
-    this.redListCall();
-    this.flickerCall().then(() => this.dataSnapshotDB().then((val) => this.isAnimalLiked(val)));
-    this.vernacularName();
+    this.vernacularName()
+      .then(() =>  this.flickerCall()
+        .then(() => this.redListCall())
+          .then(() => this.dataSnapshotDB()
+            .then((val) => this.isAnimalLiked(val))))
   }
 
   //When user clicks on left arrow when map is visible
@@ -698,85 +740,116 @@ class MapContainer extends Component {
       });
   }
 
+  notVisible = () => {
+    this.setState({showingInfoWindow: false})
+  }
 
-  //This function is called in getSpeciesInRadius
-  //Once we have the species names, we call Flickr to GET photos of those species
-  flickerCall = async function(){
-    const { species, counter, photoUrl, photoId } = this.state;
+  // NEW MORE PERF CODE
+  buildFlickrUrl = function(photo) {
+    const { farm, server, id, secret } = photo;
+    return `https://farm${farm}.staticflickr.com/${server}/${id}_${secret}_z.jpg`;
+  };
+  
+  fetchFlickrPhoto = function(speciesName, signalToken) {
+    const flickrURL = `https://api.flickr.com/services/rest/?method=flickr.photos.search&text=${speciesName}&api_key=${flickerKey}&per_page=1&format=json&sort=relevance&nojsoncallback=?&license=1,2,3,4,5,6,7,8,9,10`;
+    return axios.get(flickrURL, { cancelToken: signalToken });
+  };
+  
+  fetchOwnerInfo = function(photoId, signalToken) {
+    const url = `https://www.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=${flickerKey}&photo_id=${photoId}&format=json&nojsoncallback=1`;
+    return axios.get(url, { cancelToken: signalToken })
+  };
+
+  flickerCall = async function() {
+    this.signal = axios.CancelToken.source();
+    const { counter } = this.state;
     const flickerState = {
       isLoaded: true,
       isLoading: false,
-      counter: counter + 10,
       bottomLoading: false,
     };
-    this.signal = axios.CancelToken.source();
-    const photoUrlArray = [];
-    const photoIdArray = [];
-    for (let i = counter - 10; i < species.length; i++) {
-      const flickrURL = `https://api.flickr.com/services/rest/?method=flickr.photos.search&text=${species[i]}&api_key=${flickerKey}&per_page=1&format=json&sort=relevance&nojsoncallback=?&license=1,2,3,4,5,6,7,8,9,10`;
-      await axios.get(flickrURL, {
-        cancelToken: this.signal.token
-      }).then(resFlickr => {
-        const photoLength = resFlickr.data.photos.photo.length;
-        if (photoLength > 0) {
-          const farm = resFlickr.data.photos.photo[0].farm;
-          const server = resFlickr.data.photos.photo[0].server;
-          const id = resFlickr.data.photos.photo[0].id;
-          const secret = resFlickr.data.photos.photo[0].secret;
-          const photoUrlConst = `https://farm${farm}.staticflickr.com/${server}/${id}_${secret}_z.jpg`;
-          photoUrlArray.push(photoUrlConst);
-          photoIdArray.push(id);
-          if (i === species.length - 1) {
-                  this.setState({ photoUrl: photoUrl.concat(photoUrlArray), 
-                                  photoId: photoId.concat(photoIdArray),  
-                                  loadingUpdate: false, 
-                                  ...flickerState }, () => {
-                      moveUpSearch("visible", "moveUp");
-                      this.fetchOwnerPhoto(counter);
-                  });
+  
+    try {
+      const photoPromises = this.state.species.slice(this.state.counter - 10, this.state.counter)
+                                .map(speciesName => this.fetchFlickrPhoto(speciesName, this.signal.token));
+      const flickrResponses = await axios.all(photoPromises);
+  
+      const photoUrlArray = [];
+      const photoIdArray = [];
+  
+      flickrResponses.forEach((res, index) => {
+        if (res.data.photos.photo.length > 0) {
+          const photo = res.data.photos.photo[0];
+          photoUrlArray.push(this.buildFlickrUrl(photo));
+          photoIdArray.push(photo.id);
+          if ((this.state.counter - 10 + index) === this.state.species.length - 1) {
+            this.setState({
+              photoUrl: this.state.photoUrl.concat(photoUrlArray),
+              photoId: this.state.photoId.concat(photoIdArray),
+              loadingUpdate: false, 
+              ...flickerState 
+            }, () => {
+              moveUpSearch("visible", "moveUp");
+              this.fetchOwnerPhoto(counter);
+            });
           }
         } else {
-         
-          photoUrlArray.push(this.state.fallbackPhotos[i]);
-        
-          if (i === species.length - 1) {
-                this.setState({ photoUrl: photoUrl.concat(photoUrlArray), ...flickerState }, () => {
-                    moveUpSearch("visible", "moveUp");
-                });
+          photoUrlArray.push(this.state.fallbackPhotos[this.state.counter - 10 + index]);
+          photoIdArray.push("0");
+          if ((this.state.counter - 10 + index) === this.state.species.length - 1) {
+            this.setState({
+              photoUrl: this.state.photoUrl.concat(photoUrlArray),
+              photoId: this.state.photoId.concat(photoIdArray),
+              loadingUpdate: false, 
+              ...flickerState 
+            }, () => {
+              moveUpSearch("visible", "moveUp");
+              this.fetchOwnerPhoto(counter);
+            });
           }
-       }
-      }) 
-      .catch(errorFlickr => {
-        if (axios.isCancel(errorFlickr)) {
-          console.log('Request canceled', errorFlickr.message);
-        } else {
-            this.setState({ errorHandling: true });
-        }    
+        }
       });
+    } catch (error) {
+      console.log('Request canceled', error.message);
+      this.setState({ errorHandling: true });
     }
   }
-
+  
   fetchOwnerPhoto = async function(counter) {
     this.signal = axios.CancelToken.source();
     const ownerArray = [];
-    for (let index = counter - 10; index < this.state.photoId.length; index++) {
-       await axios.get(`https://www.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=${flickerKey}&photo_id=${this.state.photoId[index]}&format=json&nojsoncallback=1`, {
-        cancelToken: this.signal.token
-      })
-      .then(response => {
-        ownerArray.push(response.data.photo.owner.realname !== '' ? response.data.photo.owner.realname : response.data.photo.owner.username)
-        if (index === this.state.photoId.length - 1) this.setState({photoOwners: this.state.photoOwners.concat(ownerArray)})
-      })
-      .catch(errorFlickr => {
-        if (axios.isCancel(errorFlickr)) {
-          console.log('Request canceled', errorFlickr.message);
+    const licenseArray = [];
+    try {
+      const ownerPromises = this.state.photoId.slice(counter - 10, counter)
+                               .map(photoId => this.fetchOwnerInfo(photoId, this.signal.token));
+      const ownerResponses = await axios.all(ownerPromises);
+      
+      ownerResponses.forEach((response, index) => {
+        if (response.data.stat === 'ok') {
+          const ownerData = response.data.photo.owner;
+          const license = getLicenseName(response.data.photo.license);
+          const ownerName = ownerData.realname || ownerData.username;
+          licenseArray.push(license);
+          ownerArray.push(ownerName);
         } else {
-            console.log(errorFlickr)
-            this.setState({ errorHandling: true });
-        }    
-      });  
+          console.log(`Error in response at index ${index}:`, response.message || 'Unknown error');
+          console.log('counter ==> ', this.state.fallbackPhotoOwner[this.state.counter - 10 + index], this.state.fallbackPhotoOwner)
+          ownerArray.push(this.state.fallbackPhotoOwner[this.state.counter - 10 + index] === undefined ? 'Unknown' : this.state.fallbackPhotoOwner[this.state.counter - 10 + index])
+          licenseArray.push(this.state.fallbackPhotoOwner[this.state.counter - 10 + index] === ('Unknown' || undefined) ? '' : '(CC BY-NC)')
+        }
+      });
+      this.setState({
+        photoOwners: this.state.photoOwners.concat(ownerArray),
+        licenseOwners: this.state.licenseOwners.concat(licenseArray)
+      });
+  
+    } catch (error) {
+      console.log('Request canceled', error.message);
+      licenseArray.push("");
+      ownerArray.push("Unknown");
     }
   }
+  
 
   //When user clicks on one of the suggestions from google places API
   fetchPlaces = (mapProps) => {
@@ -1357,12 +1430,9 @@ class MapContainer extends Component {
       return (
       <div>
       {navBar}
-          <LoadingContainer />
-          {(loadingUpdate === true) ?
-              <div className="loadingslow">Still Loading...</div>
-            :
-              <div className="loadingslow">Loading...</div>
-          }
+          <LoadingContainer 
+            isLoaded={this.loadingUpdate}
+          />
           { isLoading ? window.scrollTo(0, 0) : null }
       </div>
       );
@@ -1389,6 +1459,7 @@ class MapContainer extends Component {
             showingInfoWindow={showingInfoWindow}
             isMapVisible={isMapVisible}
             onMarkerClick={this.onMarkerClick}
+            notVisible={this.notVisible}
           />
         </Suspense>
       </div>  

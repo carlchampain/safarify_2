@@ -6,7 +6,6 @@ import svgArrowUp from '../up-arrow-svgrepo-com.svg'
 export const moreInfoSpecies = (specie) => {
     const queryUrl = `https://apiv3.iucnredlist.org/api/v3/species/narrative/${specie}?token=${redListKey}`;
     axios.get(queryUrl).then((res) => {
-      console.log(res)
         const conservationMeasures = document.getElementById('conservationmeasures');
         if (res.data.result.length === 0 || res.data.result[0].conservationmeasures === null) {
           // conservationMeasures.previousSibling.previousSibling.previousSibling.style.display = 'none';
@@ -155,7 +154,6 @@ function helperReadMore(content, readMoreBtn) {
                 helperReadMore(content, readMoreBtn)
               }
               if(elem.code === countryCode) {
-                console.log("yes")
                   const resOrigin = elem.origin;
                   document.getElementById('origin').innerHTML = `${resOrigin} to the country`;
                   // Store the full text in a data attribute for later use

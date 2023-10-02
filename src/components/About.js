@@ -34,7 +34,11 @@ function AboutPage() {
         </p>
 
         <p className="ptags">
-        The animal images are sourced from Flickr. These photos are either public domain or licensed under Creative Commons.
+        The animal images are sourced from Flickr. In instances where images are not found on Flickr, 
+        Safarify automatically falls back to sourcing images from the GBIF API.
+        Creative Commons licenses from Flickr are of the 2.0 version.
+        Creative Commons licenses from GBIF are of the 4.0 version.
+
         </p>
         <p className="ptags">
           Icon made by <a href="http://www.freepik.com" rel="noopener noreferrer" target="_blank" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> and licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" rel="noopener noreferrer" target="_blank">CC 3.0 BY</a>
