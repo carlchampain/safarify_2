@@ -9,9 +9,15 @@ export default function Autocomplete(props) {
     const places = props.stateFromSaved.listOfAnimals;
     
     function autocompleteImpl(e) {
+        if (document.getElementById("myInput").value.length === 0 && places) {
+            setSuggestions(places);
+            setInputVal('');
+            setIsFinalVal(false);
+        } else {
         setInputVal(e.target.value);
         setSuggestions([]);    
-        setIsFinalVal(false);     
+        setIsFinalVal(false);    
+        }
     }
 
     function onClickSug(e) {
@@ -22,10 +28,18 @@ export default function Autocomplete(props) {
     }
 
     function handleOnFocus() {
+        if (document.getElementById("suggestionsContainer")) document.getElementById("suggestionsContainer").style.display = 'block';
+        if (places) {
+            setSuggestions(places);
+        }
         document.getElementById("myInput").value = '';
         setInputVal('');
         setIsFinalVal(false);
         props.updatePISB();
+    }
+
+    function handleResetSugOnTouch() {
+        if (document.getElementById("suggestionsContainer")) document.getElementById("suggestionsContainer").style.display = 'none';
     }
 
     const placeInSB = props.stateFromSaved === undefined ? '' : props.stateFromSaved.placeInSearchBar;
@@ -35,7 +49,9 @@ export default function Autocomplete(props) {
                 elem => 
                     elem.place.toLowerCase().substring(0, inputVal.length) === inputVal.toLowerCase() && inputVal.length > 0
             );
-            setSuggestions(filteredPlaces);
+            if (filteredPlaces.length > 0) {
+                setSuggestions(filteredPlaces);
+            }
         } 
         if (placeInSB !== '') {
             setInputVal(props.stateFromSaved.placeInSearchBar)
@@ -74,6 +90,7 @@ export default function Autocomplete(props) {
                     suggestionsLow={suggestions}
                     inputValLow={inputVal}
                     isFinalValLow={isFinalVal}
+                    handleResetSugOnTouchLow={handleResetSugOnTouch}
                 />
 
         </div>

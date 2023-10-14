@@ -14,14 +14,21 @@ export default class Cards extends Component {
         if (divPage) {
           divPage.addEventListener('touchstart', (evt) => {
               const rect = divPage.getBoundingClientRect();
-              console.log('touched');
               const pagex = evt.touches[0].clientX - rect.left;
-              const pagey = (evt.touches[0].clientY - 250) - rect.top;
+              const pagey = evt.touches[0].clientY - 250 - rect.top;
               this.props.handleXY(pagex, pagey);
           }, { passive: true });
+
+          // Click event handling for non-touch devices
+          divPage.addEventListener('click', (evt) => {
+            const rect = divPage.getBoundingClientRect();
+            // Calculate the click position relative to the divPage
+            const pagex = evt.clientX - rect.left;
+            const pagey = evt.clientY - 250 - rect.top;
+            this.props.handleXY(pagex, pagey);
+          }, { passive: true });
         }
-        // this.isAnimalLiked();
-        this.props.dataSnapshotDB().then((val) => this.props.isAnimalLiked(val));     
+        this.props.dataSnapshotDB().then((val) => this.props.isAnimalLiked(val));   
 
     }
     componentWillUnmount() {
@@ -30,6 +37,9 @@ export default class Cards extends Component {
           divPage.removeEventListener('touchstart', () => {
               console.log('removed touchstart listener in Mapcontainer');
           });
+          divPage.removeEventListener('click', () => {
+            console.log('removed click listener in Mapcontainer');
+        });
         }
     }
 
@@ -44,22 +54,10 @@ export default class Cards extends Component {
         });
     }
 
-    // isAnimalLiked = () => {
-    //   const species = this.props.stateFromMap.species; 
-    //   const place =  this.props.stateFromMap.place;
-    //   const animalsFromDb = this.props.stateFromMap.listOfAnimals;
-    //   console.log("animal liked cards.js ==> ", animalsFromDb)
-    //   for (let i = 0; i < animalsFromDb.length; i++) {
-    //     for (let j = 0; j < species.length; j++) {
-    //       console.log(i)
-    //       if (species[j] === animalsFromDb[i].sci_name && place === animalsFromDb[i].place) {
-            
-    //         document.getElementsByClassName('heartsvg')[i].src = logoSvgPurple;
-    //         break;
-    //       }
-    //     }
-    //   }
-    // }
+    ClickableArea= (e, url) => {
+        e.stopPropagation();
+        window.open(url, '_blank'); // Navigate to the specified URL
+    }
 
     render() {
         return (
@@ -84,7 +82,7 @@ export default class Cards extends Component {
                           />
                         <CardTitle
                           className="cardtitle"
-                          title={(this.props.stateFromMap.commonName[i] === null ? this.props.stateFromMap.species[i] : this.props.stateFromMap.commonName[i].split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '))}
+                          title={(this.props.stateFromMap.commonName[i] === null ? this.props.stateFromMap.species[i] : this.props.stateFromMap.commonName[i].split(' ').map(word => word.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('-')).join(' '))}
                           subtitle={(this.props.stateFromMap.commonName[i] === null ? '' : this.props.stateFromMap.species[i])} 
                           titleStyle={{ color: '#474747' }}
                           subtitleStyle={{
@@ -95,23 +93,11 @@ export default class Cards extends Component {
                             letterSpacing: '0.25'}}
                         >
                         <CardText className="cardtextstyle">
-                        Photo credit © {this.props.stateFromMap.photoOwners[i]} {this.props.stateFromMap.licenseOwners[i]}
+                        Photo credit © {this.props.stateFromMap.photoOwners[i]} {this.props.stateFromMap.licenseOwners[i] && this.props.stateFromMap.licenseOwners[i].name && (<a className="linkToCC" rel="noopener noreferrer" onClick={(e) => this.ClickableArea(e, this.props.stateFromMap.licenseOwners[i].url)} href="#">{this.props.stateFromMap.licenseOwners[i].name}</a>)}
                       </CardText>
                       </CardTitle>
                        
-                                            {(this.props.stateFromMap.category[i] === 'Vulnerable' ||
-                                              this.props.stateFromMap.category[i] === 'Critically Endangered' ||
-                                              this.props.stateFromMap.category[i] === 'Extinct In The Wild' ||
-                                              this.props.stateFromMap.category[i] === 'Extinct' ||
-                                              this.props.stateFromMap.category[i] === 'Endangered' ||
-                                              this.props.stateFromMap.category[i] === 'Near Threatened')
-                                              ?
-                                              (<div className="conservationstatus">
-                                                {this.props.stateFromMap.category[i].toUpperCase()}
-                                                <div className="capsule"></div>
-                                              </div>)
-                                              : ''
-                                              }
+                                        
                       </div>
                     </CardMedia>
                   </div>
@@ -138,6 +124,7 @@ export default class Cards extends Component {
                     countrycode={this.props.stateFromMap.countryCode}
                     place={this.props.stateFromMap.place}
                     photoowner={this.props.stateFromMap.photoOwners[i]}
+                    licenseowner={JSON.stringify(this.props.stateFromMap.licenseOwners[i])}
                     />
                   </div>
                 </Card>

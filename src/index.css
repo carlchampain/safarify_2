@@ -984,7 +984,10 @@ border: none;
   color: #151515;
   max-width: 410px;
   padding: 0;
+  max-height: 136px;
+  overflow-y: auto;
 }
+
 .suggestions{
   padding-top: 7px;
   padding-bottom: 7px;
@@ -1023,4 +1026,16 @@ border: none;
 
 .arrowDown {
   display: flex;
+}
+
+#preloader-container {
+  display: none;
+}
+
+.linkToCC {
+  color: inherit;
+}
+.linkToCCMapVis {
+  color: inherit;
+  display: block;
 }

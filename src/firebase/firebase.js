@@ -27,7 +27,7 @@ const writeUserData = (formattedAdress,
                       viewportLatMin, 
                       viewportLatMax, 
                       speciesKeyForSaved, 
-                      lat, lng, uid, cCode, photoOwner) => { 
+                      lat, lng, uid, cCode, photoOwner, licenseOwner) => { 
     return new Promise((resolve) => {                 
       db.ref(`users/${uid}/saved_cards`).push({
           place: formattedAdress,
@@ -42,7 +42,8 @@ const writeUserData = (formattedAdress,
           lat_place: lat,
           lng_place: lng,
           country_code: cCode,
-          photo_owner: photoOwner
+          photo_owner: photoOwner,
+          license_owner: licenseOwner
       }, resolve('SUCCESS'));
     }) 
 };

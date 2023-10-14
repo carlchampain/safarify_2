@@ -2,37 +2,37 @@ export default function getLicenseName(licenseCode) {
     let licenseName;
         switch(licenseCode) {
           case "1":
-              licenseName = '(CC BY-NC-SA)';
+              licenseName = {name: 'CC BY-NC-SA', url: 'https://creativecommons.org/licenses/by-nc-sa/2.0/'};
               break;
           case "2":
-              licenseName = '(CC BY-NC)';
+              licenseName = {name: 'CC BY-NC', url:'https://creativecommons.org/licenses/by-nc/2.0/'};
               break;
           case "3":
-              licenseName = '(CC BY-NC-ND)';
+              licenseName = {name: 'CC BY-NC-ND', url: 'https://creativecommons.org/licenses/by-nc-nd/2.0/'};
               break;
           case "4":
-              licenseName = '(CC BY 2.0)';
+              licenseName = {name: 'CC BY 2.0', url: 'https://creativecommons.org/licenses/by/2.0/'};
               break;
           case "5":
-              licenseName = '(CC BY-SA)';
+              licenseName = {name: 'CC BY-SA', url: 'https://creativecommons.org/licenses/by-sa/2.0/'};
               break;
           case "6":
-              licenseName = '(CC BY-ND)';
+              licenseName = {name: 'CC BY-ND', url: 'https://creativecommons.org/licenses/by-nd/2.0/'};
               break;
           case "7":
-              licenseName = '(No known copyright restrictions)';
+              licenseName = {name: 'No known copyright restrictions', url: 'https://www.flickr.com/commons/usage/'};
               break;
           case "8":
-              licenseName = '(United States Government Work)';
+              licenseName = {name: 'United States Government Work', url: 'http://www.usa.gov/copyright.shtml'};
               break;
           case "9":
-              licenseName = '(CC0)';
+              licenseName = {name: 'CC0', url: 'https://creativecommons.org/publicdomain/zero/1.0/'};
               break;
           case "10":
-              licenseName = '(Public Domain)';
+              licenseName = {name: 'Public Domain Mark', url: 'https://creativecommons.org/publicdomain/mark/1.0/'};
               break;
           default:
-              licenseName = '(Unknown License)';
+              licenseName = {name: 'Unknown License', url: ''};
         }
         return licenseName;
   }

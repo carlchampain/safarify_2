@@ -39,13 +39,28 @@ function flickrMorePhotosSpecies(specie, fallback) {
     })
     .catch(error => console.log('error ==>', error));
 }
+function ClickableArea(e, url) {
+    e.preventDefault(); // Prevent the default link behavior
+    window.open(url, '_blank'); // Open the link in a new tab or window
+};
 
 async function fetchMoreOwnerPhoto(i, id) {
        await axios.get(`https://www.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=${flickerKey}&photo_id=${id}&format=json&nojsoncallback=1`)
       .then(response => {
             let license = getLicenseName(response.data.photo.license)
             let photoCreditEl = document.getElementsByClassName('photo-tag')[i].nextSibling;
-            photoCreditEl.innerText = `© ${response.data.photo.owner.realname !== '' ? (response.data.photo.owner.realname + '\n' + license) : (response.data.photo.owner.username + '\n' + license)}`
+            const licenseHTML = `<a class="linkToCCMapVis" href="#" data-url="${license.url}">${license.name}</a>`;
+            const licenseContainer = document.getElementsByClassName('morephotocredit')[i];
+            licenseContainer.innerHTML += licenseHTML;
+
+            // Add a click event listener to the container
+            licenseContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('linkToCCMapVis')) {
+                const url = e.target.getAttribute('data-url');
+                ClickableArea(e, url);
+            }
+            });
+            photoCreditEl.innerHTML = `© ${response.data.photo.owner.realname !== '' ? (response.data.photo.owner.realname + '\n' + licenseHTML) : (response.data.photo.owner.username + '\n' + licenseHTML)}`
       })
       .catch(errorFlickr => {
             console.log(errorFlickr)
@@ -61,7 +76,6 @@ const MapVisible = memo(function MapVisible(props) {
 
     const lat = props.lat;
     const lng = props.lng;
-    // onReady={flickrMorePhotosSpecies(props.specie, props.fallback)}
     return (
         <div>
             <Map
@@ -87,6 +101,7 @@ const MapVisible = memo(function MapVisible(props) {
                     onClick={props.onMarkerClick}
                     dataSetName={props.activeDataSetName[i] ? props.activeDataSetName[i] : 'unknown'}
                     year={props.year[i] ? props.year[i] : 'unknown'}
+                    datasetKey={props.datasetKey[i] ? props.datasetKey[i] : 'unknown'}
                     gbifOccurence={props.activeGbifOccurence[i] ? props.activeGbifOccurence[i] : 'unknown'}
                     icon={'https://maps.google.com/mapfiles/ms/micons/purple-dot.png'}
                     />
@@ -99,24 +114,24 @@ const MapVisible = memo(function MapVisible(props) {
                     style={{ overflowY: 'auto' }}
                 >
                 <div>
-                <h4>From: {props.activeDataSetName}</h4>
-                <h4>Original record: <a href={`https://www.gbif.org/occurrence/${props.activeGbifOccurence}`} target="_blank" rel="noopener noreferrer">Link to GBIF</a></h4>
-                <h4>Year: {props.year}</h4>
+                    <h4>From: <a href={`https://www.gbif.org/dataset/${props.datasetKey}`} target="_blank" rel="noopener noreferrer">{props.activeDataSetName}</a></h4>
+                    <h4>Original record: <a href={`https://www.gbif.org/occurrence/${props.activeGbifOccurence}`} target="_blank" rel="noopener noreferrer">Link to GBIF</a></h4>
+                    <h4>Year: {props.year}</h4>
                 </div>
                 </InfoWindow>
         </Map> 
                     <div id="photos-title-map">Photos</div>
                 <div className="row">
-                    <div className="column"><img alt="" id="photo-1" className="photo-tag" src=""/><div className="morephotocredit"></div></div>
-                    <div className="column"><img alt="" id="photo-2" className="photo-tag" src=""/><div className="morephotocredit"></div></div>
-                    <div className="column"><img alt="" id="photo-3" className="photo-tag" src=""/><div className="morephotocredit"></div></div>
-                    <div className="column"><img alt="" id="photo-4" className="photo-tag" src=""/><div className="morephotocredit"></div></div>
-                    <div className="column"><img alt="" id="photo-5" className="photo-tag" src=""/><div className="morephotocredit"></div></div>
-                    <div className="column"><img alt="" id="photo-6" className="photo-tag" src=""/><div className="morephotocredit"></div></div>
-                    <div className="column"><img alt="" id="photo-7" className="photo-tag" src=""/><div className="morephotocredit"></div></div>
-                    <div className="column"><img alt="" id="photo-8" className="photo-tag" src=""/><div className="morephotocredit"></div></div>
-                    <div className="column"><img alt="" id="photo-9" className="photo-tag" src=""/><div className="morephotocredit"></div></div>
-                    <div className="column"><img alt="" id="photo-10" className="photo-tag" src=""/><div className="morephotocredit"></div></div>
+                    <div className="column"><img alt="" id="photo-1" className="photo-tag" src=""/><div className="morephotocredit">Loading...</div></div>
+                    <div className="column"><img alt="" id="photo-2" className="photo-tag" src=""/><div className="morephotocredit">Loading...</div></div>
+                    <div className="column"><img alt="" id="photo-3" className="photo-tag" src=""/><div className="morephotocredit">Loading...</div></div>
+                    <div className="column"><img alt="" id="photo-4" className="photo-tag" src=""/><div className="morephotocredit">Loading...</div></div>
+                    <div className="column"><img alt="" id="photo-5" className="photo-tag" src=""/><div className="morephotocredit">Loading...</div></div>
+                    <div className="column"><img alt="" id="photo-6" className="photo-tag" src=""/><div className="morephotocredit">Loading...</div></div>
+                    <div className="column"><img alt="" id="photo-7" className="photo-tag" src=""/><div className="morephotocredit">Loading...</div></div>
+                    <div className="column"><img alt="" id="photo-8" className="photo-tag" src=""/><div className="morephotocredit">Loading...</div></div>
+                    <div className="column"><img alt="" id="photo-9" className="photo-tag" src=""/><div className="morephotocredit">Loading...</div></div>
+                    <div className="column"><img alt="" id="photo-10" className="photo-tag" src=""/><div className="morephotocredit">Loading...</div></div>
                 </div>
             <div id="infocontainer">
                 <div className="headerInfo">Origin</div> <button className="readMore"><img alt="arrow" src={svgArrow} className="arrowDown"/></button>

@@ -17,19 +17,32 @@ export default function SavedAnimalsCards(props) {
 
   const handleTouch = useCallback((evt) => {
       const divPage = document.getElementById('cardcontainer');
-      if (divPage){
+      if (divPage && evt.type === 'touchstart'){
         const rect = divPage.getBoundingClientRect();
-        console.log('touched');
         const pagex = evt.touches[0].clientX - rect.left;
         const pagey = (evt.touches[0].clientY) - rect.top;
         handleXYL(pagex, pagey);
+        props.handleResetSugOnTouchLow();
       }
-  }, [handleXYL])
+      if (divPage && evt.type === 'click') {
+        const rect = divPage.getBoundingClientRect();
+        const pagex = evt.clientX - rect.left;
+        const pagey = evt.clientY - 250 - rect.top;
+        handleXYL(pagex, pagey);
+        props.handleResetSugOnTouchLow();
+      }
+  }, [handleXYL, props])
     
   useEffect(() => { 
     const divPage = document.getElementById('cardcontainer');
-    if (divPage) divPage.addEventListener('touchstart', handleTouch, { passive: true });
-    return () =>  divPage.removeEventListener('touchstart', handleTouch); 
+    if (divPage) {
+      divPage.addEventListener('touchstart', handleTouch, { passive: true });
+      divPage.addEventListener('click', handleTouch, { passive: true });
+    }
+    return () =>  {
+      divPage.removeEventListener('touchstart', handleTouch); 
+      divPage.removeEventListener('click', handleTouch); 
+    }
   }, [handleTouch])
 
   const handleLoadInSaved = (i) => {
@@ -42,6 +55,11 @@ export default function SavedAnimalsCards(props) {
   const viewSightings = (specKey, specie, commonName, i, val) => {
     clickedCloseBtn();
     props.viewSightingsLow(specKey, specie, commonName, i, val);
+  }
+
+  const ClickableArea= (e, url) => {
+    e.stopPropagation();
+    window.open(url, '_blank'); // Navigate to the specified URL
   }
 
   const filteredSaved = () => {
@@ -95,8 +113,8 @@ export default function SavedAnimalsCards(props) {
                                 <CardTitle
         
                                   className="cardtitle"
-                                  title={(animals[i].vernacular_name === 'null') ? elem.sci_name.toLowerCase() : animals[i].vernacular_name}
-                                  subtitle={(animals[i].vernacular_name === 'null') ? '' : elem.sci_name.toLowerCase()}
+                                  title={(animals[i].vernacular_name === 'Null') ? elem.sci_name : animals[i].vernacular_name}
+                                  subtitle={(animals[i].vernacular_name === 'Null') ? '' : elem.sci_name}
                                   titleStyle={{ color: '#373737' }}
                                   subtitleStyle={{
                                     color: '#424242',
@@ -106,7 +124,7 @@ export default function SavedAnimalsCards(props) {
                                     letterSpacing: '0.25' }}
                                 >
                                   <CardText className="cardtextstyle">
-                                    Photo credit © {animals[i].photo_owner}
+                                    Photo credit © {animals[i].photo_owner} {animals[i].license_owner && (<a className="linkToCC" rel="noopener noreferrer" onClick={(e) => ClickableArea(e, animals[i].license_owner.url)} href="#">{animals[i].license_owner.name}</a>)}
                                   </CardText>
                                 </CardTitle>
                               </div>
@@ -151,8 +169,8 @@ export default function SavedAnimalsCards(props) {
                                 <CardTitle
         
                                   className="cardtitle"
-                                  title={(animals[elem].vernacular_name === 'null') ? animals[elem].sci_name : animals[elem].vernacular_name}
-                                  subtitle={(animals[elem].vernacular_name === 'null') ? '' : animals[elem].sci_name}
+                                  title={(animals[elem].vernacular_name === 'Null') ? animals[elem].sci_name : animals[elem].vernacular_name}
+                                  subtitle={(animals[elem].vernacular_name === 'Null') ? '' : animals[elem].sci_name}
                                   titleStyle={{ color: '#373737'}}
                                   subtitleStyle={{
                                     color: '#424242',
@@ -162,7 +180,7 @@ export default function SavedAnimalsCards(props) {
                                       letterSpacing: '0.25'}}
                                 >
                                   <CardText className="cardtextstyle">
-                                      Photo credit © {animals[elem].photo_owner}
+                                      Photo credit © {animals[elem].photo_owner} {animals[i].license_owner && (<a className="linkToCC" rel="noopener noreferrer" onClick={(e) => ClickableArea(e, animals[i].license_owner.url)} href="#">{animals[i].license_owner.name}</a>)}
                                   </CardText>
                                 </CardTitle>  
                               </div>

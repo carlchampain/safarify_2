@@ -91,6 +91,7 @@ const INITIAL_STATE = {
   showPopUpSearch: false,
   gbifOccurence: [],
   activeGbifOccurence: '',
+  datasetKey: [],
   listOfAnimals: [],
   photoId: [],
   photoOwners: [],
@@ -216,6 +217,7 @@ class MapContainer extends Component {
       const results = json.data.results;
       const speciesCoordinate = [];
       const dataSetNameArray = [];
+      const datasetKeyArray = [];
       const gbifOccurenceArray = [];
       const yearArray = [];
       const resultLength = results.length;
@@ -227,7 +229,8 @@ class MapContainer extends Component {
           isSafarifyTitle: false,
           activeDataSetName: dataSetNameArray,
           year: yearArray,
-          activeGbifOccurence: gbifOccurenceArray
+          activeGbifOccurence: gbifOccurenceArray,
+          datasetKey: datasetKeyArray
         }, () => {
           import('../modules/MoreInfoOnSpecies').then((module) => {
             module.moreInfoSpecies(specie);
@@ -243,6 +246,7 @@ class MapContainer extends Component {
         dataSetNameArray.push(results[i].datasetName || results[i].collectionCode);
         yearArray.push(results[i].year);
         gbifOccurenceArray.push(results[i].key)
+        datasetKeyArray.push(results[i].datasetKey)
         if (i === resultLength - 1) {
             this.setState({
               speciesXY: speciesCoordinate,
@@ -251,7 +255,8 @@ class MapContainer extends Component {
               activeDataSetName: dataSetNameArray,
               activeGbifOccurence: gbifOccurenceArray,              
               year: yearArray,
-              gbifOccurence: gbifOccurenceArray
+              gbifOccurence: gbifOccurenceArray,
+              datasetKey: datasetKeyArray
             }, () => {
               import('../modules/MoreInfoOnSpecies').then((module) => {
                 module.isIntroduced(specie, this.state.countryCode);
@@ -448,10 +453,9 @@ class MapContainer extends Component {
           loadingUpdate: true
         });
       if (GbifResults > 0) {
-        //Red List Call ??
         this.vernacularName()
           .then(() => this.flickerCall())
-            .then(() => this.redListCall())
+            // .then(() => this.redListCall())
       }
     }).catch(errorGbif => {
         if (errorGbif.response) {
@@ -490,7 +494,6 @@ class MapContainer extends Component {
   
     try {
       const responses = await axios.all(requests);
-  
       responses.forEach((response, i) => {
         const vernName = response.data.results;
         let foundName = null;
@@ -501,28 +504,32 @@ class MapContainer extends Component {
   
           if (
             ((isAmphRept &&
-              (source === 'Catalogue of Life' ||
+              (source === 'Catalogue of Life Checklist' ||
                 source === 'Taxonomy in Flux Checklist' ||
                 source === 'Integrated Taxonomic Information System (ITIS)' ||
-                source === 'Multilingual IOC World Bird List, v8.1' ||
+                source === 'Multilingual IOC World Bird List, v13.2' ||
                 source === 'The Clements Checklist' ||
                 source === 'Colaboraciones Americanas Sobre Aves' ||
                 source === 'The Paleobiology Database' ||
+                source === 'NCBI Taxonomy' ||
+                source === 'Global Invasive Species Database' ||
+                source === 'Yanayacu Natural History Research Group'||
+                source === 'Colaboraciones Americanas Sobre Aves'||
                 source === 'Belgian Species List') &&
               language === 'eng') ||
-              source === 'NCBI Taxonomy' ||
-              source === 'Global Invasive Species Database') ||
             (!isAmphRept &&
-              ((source === 'Catalogue of Life' ||
+              ((source === 'Catalogue of Life Checklist' ||
                 source === 'Taxonomy in Flux Checklist' ||
+                source === 'Yanayacu Natural History Research Group'||
+                source === 'Colaboraciones Americanas Sobre Aves'||
                 source === 'Integrated Taxonomic Information System (ITIS)' ||
-                source === 'Multilingual IOC World Bird List, v8.1' ||
+                source === 'Multilingual IOC World Bird List, v13.2' ||
                 source === 'The Clements Checklist' ||
                 source === 'Colaboraciones Americanas Sobre Aves' ||
                 source === 'The Paleobiology Database' ||
                 source === 'NCBI Taxonomy' ||
                 source === 'EUNIS Biodiversity Database') &&
-                language === 'eng'))
+                language === 'eng')))
           ) {
             foundName = vernName[j].vernacularName;
             break;
@@ -592,71 +599,71 @@ class MapContainer extends Component {
   }
 
 
-  redListCall = async function() {
-    const { species, counter, category, speciesArrLength, speciesLength } = this.state;
-    const categoryArray = [];
-    this.signal = axios.CancelToken.source();
-    const requestPromises = [];
-    for (let i = counter - 10; i < species.length; i++) {
-      requestPromises.push(
-        axios.get(`https://apiv3.iucnredlist.org/api/v3/species/${species[i]}?token=${redListKey}`, {
-          cancelToken: this.signal.token,
-        })
-      );
-    }
+  // redListCall = async function() {
+  //   const { species, counter, category, speciesArrLength, speciesLength } = this.state;
+  //   const categoryArray = [];
+  //   this.signal = axios.CancelToken.source();
+  //   const requestPromises = [];
+  //   for (let i = counter - 10; i < species.length; i++) {
+  //     requestPromises.push(
+  //       axios.get(`https://apiv3.iucnredlist.org/api/v3/species/${species[i]}?token=${redListKey}`, {
+  //         cancelToken: this.signal.token,
+  //       })
+  //     );
+  //   }
   
-    try {
-      const responses = await axios.all(requestPromises);
-      console.log("res ==> ", responses, counter)
-      responses.forEach((res, i) => {
-        console.log("category ==> ", res, i)
-        if (res.data.result.length === 0) {
-          categoryArray.push('Unknown');
-        } else {
-          const responseCategory = res.data.result[0].category;
-          switch (responseCategory) {
-            case 'VU':
-              categoryArray.push('Vulnerable');
-              break;
-            case 'CR':
-              categoryArray.push('Critically Endangered');
-              break;
-            case 'EW':
-              categoryArray.push('Extinct In The Wild');
-              break;
-            case 'EX':
-              categoryArray.push('Extinct');
-              break;
-            case 'EN':
-              categoryArray.push('Endangered');
-              break;
-            case 'NT':
-              categoryArray.push('Near Threatened');
-              break;
-            default:
-              categoryArray.push('Unknown');
-          }
-        }
+  //   try {
+  //     const responses = await axios.all(requestPromises);
+  //     console.log("res ==> ", responses, counter)
+  //     responses.forEach((res, i) => {
+  //       console.log("category ==> ", res, i)
+  //       if (res.data.result.length === 0) {
+  //         categoryArray.push('Unknown');
+  //       } else {
+  //         const responseCategory = res.data.result[0].category;
+  //         switch (responseCategory) {
+  //           case 'VU':
+  //             categoryArray.push('Vulnerable');
+  //             break;
+  //           case 'CR':
+  //             categoryArray.push('Critically Endangered');
+  //             break;
+  //           case 'EW':
+  //             categoryArray.push('Extinct In The Wild');
+  //             break;
+  //           case 'EX':
+  //             categoryArray.push('Extinct');
+  //             break;
+  //           case 'EN':
+  //             categoryArray.push('Endangered');
+  //             break;
+  //           case 'NT':
+  //             categoryArray.push('Near Threatened');
+  //             break;
+  //           default:
+  //             categoryArray.push('Unknown');
+  //         }
+  //       }
   
-        if (i === counter - 1 || speciesArrLength === speciesLength) {
-          this.setState({
-            category: category.concat(categoryArray),
-            counter: counter + 10
-          });
-        }
-      });
-    } catch (error) {
-      if (axios.isCancel(error)) {
-        console.log('Request canceled', error.message);
-      }
-      const err = '';
-      categoryArray.push(err);
-      this.setState({
-        category: category.concat(categoryArray),
-        counter: counter + 10
-      });
-    }
-  }
+  //       if (i === counter - 1 || speciesArrLength === speciesLength) {
+  //         this.setState({
+  //           category: category.concat(categoryArray),
+  //           counter: counter + 10
+  //         });
+  //       }
+  //     });
+  //   } catch (error) {
+  //     if (axios.isCancel(error)) {
+  //       console.log('Request canceled', error.message);
+  //     }
+  //     const err = '';
+  //     categoryArray.push(err);
+  //     this.setState({
+  //       category: category.concat(categoryArray),
+  //       counter: counter + 10
+  //     });
+  //   }
+  // }
   
 
   loadMore = () => {
@@ -675,7 +682,7 @@ class MapContainer extends Component {
   loadMoreStatusAndName = () => {
     this.vernacularName()
       .then(() =>  this.flickerCall()
-        .then(() => this.redListCall())
+        // .then(() => this.redListCall())
           .then(() => this.dataSnapshotDB()
             .then((val) => this.isAnimalLiked(val))))
   }
@@ -736,6 +743,7 @@ class MapContainer extends Component {
         activeDataSetName: e.dataSetName,
         year: e.year,
         activeGbifOccurence: e.gbifOccurence,
+        datasetKey: e.datasetKey,
         link: e.occurrenceID
       });
   }
@@ -835,17 +843,18 @@ class MapContainer extends Component {
           console.log(`Error in response at index ${index}:`, response.message || 'Unknown error');
           console.log('counter ==> ', this.state.fallbackPhotoOwner[this.state.counter - 10 + index], this.state.fallbackPhotoOwner)
           ownerArray.push(this.state.fallbackPhotoOwner[this.state.counter - 10 + index] === undefined ? 'Unknown' : this.state.fallbackPhotoOwner[this.state.counter - 10 + index])
-          licenseArray.push(this.state.fallbackPhotoOwner[this.state.counter - 10 + index] === ('Unknown' || undefined) ? '' : '(CC BY-NC)')
+          licenseArray.push(this.state.fallbackPhotoOwner[this.state.counter - 10 + index] === ('Unknown' || undefined) ? {name: '', url:''} : {name: 'CC BY-NC', url:'https://creativecommons.org/licenses/by-nc/4.0/'})
         }
       });
       this.setState({
         photoOwners: this.state.photoOwners.concat(ownerArray),
-        licenseOwners: this.state.licenseOwners.concat(licenseArray)
+        licenseOwners: this.state.licenseOwners.concat(licenseArray),
+        counter: counter + 10
       });
   
     } catch (error) {
-      console.log('Request canceled', error.message);
-      licenseArray.push("");
+      console.log('Error in catch fetchOwnerPhoto: ', error.message);
+      licenseArray.push({name: '', url:''});
       ownerArray.push("Unknown");
     }
   }
@@ -871,7 +880,6 @@ class MapContainer extends Component {
           }
         // }
         const formattedAdress = autocomplete.getPlace().formatted_address;
-        console.log(place.geometry)
         
           const lat = place.geometry.location.lat();
           const lng = place.geometry.location.lng();
@@ -879,7 +887,6 @@ class MapContainer extends Component {
           const viewportLngMax = place.geometry.viewport.getNorthEast().lng();
           const viewportLatMin = place.geometry.viewport.getNorthEast().lat();
           const viewportLatMax = place.geometry.viewport.getSouthWest().lat();
-          console.log("test  ", viewportLngMin, viewportLngMax, viewportLatMin, viewportLatMax)
 
           this.fetchSightingsAfterPlace(viewportLatMax, viewportLatMin, viewportLngMin, viewportLngMax, countryCode, formattedAdress, lat, lng);
         } catch (e) {
@@ -1059,7 +1066,8 @@ class MapContainer extends Component {
     } else if(!user) this.togglePopup();
       else {
       const uid = fire.auth.currentUser.uid;
-      const comName = event.target.getAttribute('commonname');
+      const comName = event.target.getAttribute('commonname').split(' ').map(word => word.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('-')).join(' ');
+      console.log("comName ==> ", comName)
       const latName = event.target.getAttribute('species');
       const flickerUrl = event.target.getAttribute('flicker');
       const viewportLngMin = event.target.getAttribute('viewportlngmin');
@@ -1071,9 +1079,10 @@ class MapContainer extends Component {
       const lng = event.target.getAttribute('lng');
       const cCode = event.target.getAttribute('countrycode');
       const photoOwner = event.target.getAttribute('photoowner');
+      const licenseOwner = JSON.parse(event.target.getAttribute('licenseowner'));
       document.getElementsByClassName('heartsvg')[indexKey].src = logoSvgPurple;
       // document.getElementsByClassName('heartsvg')[indexKey].style.pointerEvents = 'none';
-      fire.writeUserData(this.state.place, comName, latName, flickerUrl, viewportLngMin, viewportLngMax, viewportLatMin, viewportLatMax, speciesKeySaved, lat, lng, uid, cCode, photoOwner)
+      fire.writeUserData(this.state.place, comName, latName, flickerUrl, viewportLngMin, viewportLngMax, viewportLatMin, viewportLatMax, speciesKeySaved, lat, lng, uid, cCode, photoOwner, licenseOwner)
         .then(() => this.dataSnapshotDB())
     }
   }
@@ -1175,13 +1184,13 @@ class MapContainer extends Component {
       speciesArray,
       isAccountSettings,
       deleteError, 
-      loadingUpdate,
       clickedSpecie,
       fallbackPhotos,
       clickedFallback,
       showPopUpSearch,
       place,
-      activeGbifOccurence
+      activeGbifOccurence,
+      datasetKey
     } = this.state;
     const popUp = (
       <PopUp
@@ -1442,7 +1451,7 @@ class MapContainer extends Component {
       <div>
         <NavBarMap 
           onLeftIconButtonClick={this.handleIconClick}
-          title={animalNameInTitle ? animalNameInTitle : clickedSpecie.toLowerCase()}
+          title={animalNameInTitle ? animalNameInTitle.split(' ').map(word => word.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('-')).join(' ') : clickedSpecie}
         />
         <Suspense fallback={<LoadingContainer isLoading={isMapVisible} />}>
           <MapVisible
@@ -1456,6 +1465,7 @@ class MapContainer extends Component {
             activeDataSetName={activeDataSetName}
             year={year}
             activeGbifOccurence={activeGbifOccurence}
+            datasetKey={datasetKey}
             showingInfoWindow={showingInfoWindow}
             isMapVisible={isMapVisible}
             onMarkerClick={this.onMarkerClick}

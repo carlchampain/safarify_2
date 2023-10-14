@@ -46,6 +46,7 @@ class SavedAnimals extends Component {
       placeInSearchBar: '',
       gbifOccurence: [],
       activeGbifOccurence: '',
+      datasetKey: [],
       listOfAnimals: []
     };
   }
@@ -59,7 +60,6 @@ class SavedAnimals extends Component {
   }
 
   onClickViewSithingsSaved = (specKey, specie, commonName, i, val) => {
-    console.log("com name ", commonName)
     this.setState({ isLoadingMap: true, placeInSearchBar:  val === undefined ? '' : val });
     this.signal = axios.CancelToken.source();
     const indexForXY = i;
@@ -73,6 +73,7 @@ class SavedAnimals extends Component {
       const speciesCoordinate = [];
       const dataSetNameArray = [];
       const yearArray = [];
+      const datasetKeyArray = [];
       const gbifOccurenceArray = [];
       const resultLength = results.length;
       for (let i = 0; i < resultLength; i++) {
@@ -84,8 +85,9 @@ class SavedAnimals extends Component {
         dataSetNameArray.push(results[i].datasetName || results[i].collectionCode);
         yearArray.push(results[i].year);
         gbifOccurenceArray.push(results[i].key)
+        datasetKeyArray.push(results[i].datasetKey)
         let animalName = '';
-        if (commonName === 'Not found') {
+        if (commonName === 'Not found' || commonName === 'Null') {
           animalName = specie;
         } else {
           animalName = commonName;
@@ -99,7 +101,8 @@ class SavedAnimals extends Component {
               isSafarifyTitle: false,
               activeDataSetName: dataSetNameArray,
               year: yearArray,
-              activeGbifOccurence: gbifOccurenceArray
+              activeGbifOccurence: gbifOccurenceArray,
+              datasetKey: datasetKeyArray
             }, () => {
               this.isMapVisible(specie);
             })
@@ -129,6 +132,7 @@ class SavedAnimals extends Component {
       activeMarker: marker.position,
       activeDataSetName: e.dataSetName,
       activeGbifOccurence: e.gbifOccurence,
+      datasetKey: e.datasetKey,
       year: e.year
     });
   }
@@ -166,25 +170,31 @@ class SavedAnimals extends Component {
   }
 
   sortObject = (snapFromDbArrFinal, uniqueKeyArr) => {
+    // console.log("unordered ==> ", snapFromDbArrFinal)
     snapFromDbArrFinal.sort((a, b) => {
-      const firstVar = a.place.replace(/[0-9]/g, '').replace(/^\s+/g, '');
-      const secVar = b.place.replace(/[0-9]/g, '').replace(/^\s+/g, '');
-      if (firstVar === secVar) {
-        const aName = a.vernacular_name || a.sci_name || '';
-        const bName = b.vernacular_name || b.sci_name || '';
+      const aPlace = a.place.replace(/[0-9]/g, '').trim();
+      const bPlace = b.place.replace(/[0-9]/g, '').trim();
     
-        // If both are sci_name, compare them directly
-        if (!a.vernacular_name && !b.vernacular_name) {
-          return aName.localeCompare(bName, undefined, { sensitivity: 'base' });
-        }
+      const aVernacularName = a.vernacular_name === "null" ? "" : a.vernacular_name || '';
+      const bVernacularName = b.vernacular_name === "null" ? "" : b.vernacular_name || '';
     
+      const aSciName = a.sci_name || '';
+      const bSciName = b.sci_name || '';
+    
+      if (aPlace === bPlace) {
+        // Compare using both vernacular_name and sci_name
+        const aName = aVernacularName || aSciName;
+        const bName = bVernacularName || bSciName;
+        
         return aName.localeCompare(bName, undefined, { sensitivity: 'base' });
       } else {
-        return firstVar.localeCompare(secVar, undefined, { sensitivity: 'base' });
+        return aPlace.localeCompare(bPlace, undefined, { sensitivity: 'base' });
       }
-     });
+    });    
+        
      this.finalStateUpdate(snapFromDbArrFinal, uniqueKeyArr);
   }
+
   finalStateUpdate = (snapFromDbArrFinal, uniqueKeyArr) => {
     snapFromDbArrFinal.forEach(elem => elem.place = elem.place.replace(/[0-9]/g, '').trim())
     this.setState({
@@ -217,7 +227,6 @@ class SavedAnimals extends Component {
           snapFromDbArr.forEach((elem) => {
             snapFromDbArrFinal.push(elem[1]);
           });
-
           dataSnapshot.forEach((elem) => {
               const keyFromDB = elem.key;
               uniqueKeyArr.push(keyFromDB)
@@ -328,6 +337,7 @@ class SavedAnimals extends Component {
             hasErrorBoundaries,
             clickedSpecie,
             isLoadingMap,
+            datasetKey,
             listOfAnimals
           } = this.state;   
     if (hasErrorBoundaries) {
@@ -353,7 +363,7 @@ class SavedAnimals extends Component {
       <div>
         <NavBarMap 
           onLeftIconButtonClick={this.handleIconClick}
-          title={animalNameInTitle === 'null' ? clickedSpecie.toLowerCase() : animalNameInTitle} 
+          title={animalNameInTitle === 'Null' ? clickedSpecie : animalNameInTitle} 
         />
         <Suspense fallback={<LoadingContainer isLoading={isMapVisible}/>}>
           <MapVisible
@@ -366,6 +376,7 @@ class SavedAnimals extends Component {
           activeDataSetName={activeDataSetName}
           activeGbifOccurence={activeGbifOccurence}
           year={year}
+          datasetKey={datasetKey}
           showingInfoWindow={showingInfoWindow}
           isMapVisible={isMapVisible}
           onMarkerClick={this.onMarkerClickSaved}
